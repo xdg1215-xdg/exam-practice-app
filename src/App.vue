@@ -30,7 +30,7 @@ onMounted(async () => {
   if (saved) {
     try {
       const idxs = JSON.parse(saved)
-      wrongIndexes.value = idxs.filter(i => i < questions.value.length)
+      wrongIndexes.value = idxs.filter(i => i >= 0 && i < questions.value.length)
     } catch (e) {
       wrongIndexes.value = []
     }
@@ -50,7 +50,7 @@ function startPractice(selectedMode) {
       return
     }
   }
-  originalIndexMap.value = activeQuestions.value.map(q => questions.value.indexOf(q))
+  originalIndexMap.value = activeQuestions.value.map(q => q.id)
   currentIndex.value = 0
   userAnswers.value = {}
   showAnswer.value = false
@@ -79,6 +79,10 @@ function onSubmit() {
   const correctAns = q.answer.split('').sort().join('')
   if (userAns !== correctAns) {
     const origIdx = originalIndexMap.value[currentIndex.value]
+    if (origIdx == null || origIdx < 0) {
+      console.warn('[onSubmit] invalid origIdx=', origIdx, 'for qid=', q.id)
+      return
+    }
     if (!wrongIndexes.value.includes(origIdx)) {
       wrongIndexes.value.push(origIdx)
       localStorage.setItem('wrongQuestions', JSON.stringify(wrongIndexes.value))

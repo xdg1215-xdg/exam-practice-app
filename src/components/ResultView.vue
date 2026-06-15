@@ -75,7 +75,7 @@ const wrongQuestions = computed(() => {
         <h3 style="font-size:16px;margin-bottom:12px;color:#424242;">📋 错题回顾</h3>
         <div class="review-list">
           <div v-for="(item, i) in wrongQuestions" :key="i" class="review-item">
-            <div class="q-num">第 {{ questions.indexOf(item.q) + 1 }} 题 · 答错</div>
+            <div class="q-num">第 {{ item.q.id + 1 }} 题 · 答错</div>
             <div class="q-text">{{ item.q.question }}</div>
             <div class="q-answer">
               <span class="your">你的答案：{{ item.userAns.length > 0 ? item.userAns.sort().join('') : '（未作答）' }}</span>
