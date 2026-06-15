@@ -55,6 +55,24 @@ function isWrong(letter) {
 const progress = computed(() => {
   return Math.round(((props.index + 1) / props.total) * 100)
 })
+
+// Normalize answer: split into sorted unique letters array
+function normalizeAnswer(ans) {
+  if (!ans) return []
+  return [...new Set(ans.toUpperCase().split(''))].filter(c => /[A-F]/.test(c)).sort()
+}
+
+const isAnswerCorrect = computed(() => {
+  const userSorted = normalizeAnswer(props.selected.join(''))
+  const correctSorted = normalizeAnswer(props.question.answer)
+  if (userSorted.length !== correctSorted.length) return false
+  return userSorted.every((l, i) => l === correctSorted[i])
+})
+
+const userAnswerText = computed(() => {
+  const u = [...props.selected].sort().join('')
+  return u || '（未选）'
+})
 </script>
 
 <template>
@@ -111,11 +129,9 @@ const progress = computed(() => {
           <span class="label">正确答案：</span>
           <span style="font-weight:600;color:#2e7d32;">{{ question.answer }}</span>
           <span v-if="isMulti" style="margin-left:8px;font-size:12px;color:#757575;">（多选）</span>
-          <div v-if="isSelected(question.answer[0]) && !isMulti" style="margin-top:6px;color:#4caf50;font-size:13px;">✓ 回答正确</div>
-          <div v-else-if="!isMulti" style="margin-top:6px;color:#f44336;font-size:13px;">✗ 回答错误，已加入错题本</div>
-          <div v-else style="margin-top:6px;font-size:13px;" :class="[...selected].sort().join('') === question.answer.split('').sort().join('') ? 'correct-text' : 'wrong-text'">
-            <span v-if="[...selected].sort().join('') === question.answer.split('').sort().join('').length" style="color:#4caf50">✓ 回答正确</span>
-            <span v-else style="color:#f44336">✗ 你的答案：{{ selected.sort().join('') || '（未选）' }}，已加入错题本</span>
+          <div v-if="isAnswerCorrect" style="margin-top:6px;color:#4caf50;font-size:13px;">✓ 回答正确</div>
+          <div v-else style="margin-top:6px;color:#f44336;font-size:13px;">
+            ✗ 你的答案：{{ userAnswerText }}，已加入错题本
           </div>
         </div>
       </div>
