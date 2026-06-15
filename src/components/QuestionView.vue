@@ -19,7 +19,9 @@ const typeLabel = computed(() => {
 
 const letters = computed(() => {
   if (props.question.type === 'judge') return ['A', 'B']
-  return ['A', 'B', 'C', 'D']
+  // For single/multi: use only options that have content (A-F)
+  const opts = props.question.options || {}
+  return ['A', 'B', 'C', 'D', 'E', 'F'].filter(l => opts[l])
 })
 
 const isMulti = computed(() => props.question.type === 'multi')
@@ -90,28 +92,18 @@ const progress = computed(() => {
 
         <div v-else class="options">
           <button
+            v-for="letter in letters"
+            :key="letter"
             class="option"
             :class="{
-              selected: isSelected('A') && !showAnswer,
-              correct: showAnswer && question.answer === 'A',
-              wrong: isWrong('A')
+              selected: isSelected(letter) && !showAnswer,
+              correct: showAnswer && question.answer === letter,
+              wrong: isWrong(letter)
             }"
-            @click="toggle('A')"
+            @click="toggle(letter)"
           >
-            <span class="letter">A</span>
-            <span class="text">正确</span>
-          </button>
-          <button
-            class="option"
-            :class="{
-              selected: isSelected('B') && !showAnswer,
-              correct: showAnswer && question.answer === 'B',
-              wrong: isWrong('B')
-            }"
-            @click="toggle('B')"
-          >
-            <span class="letter">B</span>
-            <span class="text">错误</span>
+            <span class="letter">{{ letter }}</span>
+            <span class="text">{{ question.options[letter] }}</span>
           </button>
         </div>
 
