@@ -8,7 +8,7 @@ const emit = defineEmits(['start', 'clear'])
 
 <template>
   <div class="home">
-    <h1>📚 常化制度练习</h1>
+    <h1>📚 师云龙专用</h1>
     <p class="subtitle">中盐常化 2026 年职能部室中层管理人员制度学习题库</p>
 
     <div class="mode-list">
