@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, onMounted, watch, onUnmounted } from 'vue'
 
 const props = defineProps({
   question: { type: Object, required: true },
@@ -7,9 +7,14 @@ const props = defineProps({
   total: { type: Number, required: true },
   selected: { type: Array, default: () => [] },
   showAnswer: { type: Boolean, default: false },
-  mode: { type: String, default: 'sequential' }
+  mode: { type: String, default: 'sequential' },
+  activeQuestions: { type: Array, default: () => [] },
+  wrongIndexes: { type: Array, default: () => [] },
+  visitedAt: { type: Object, default: () => ({}) }
 })
-const emit = defineEmits(['select', 'submit', 'next', 'prev', 'show', 'home'])
+const emit = defineEmits(['select', 'submit', 'next', 'prev', 'show', 'home', 'jump', 'visited'])
+
+const showPanel = ref(false)
 
 const typeLabel = computed(() => {
   if (props.question.type === 'single') return '单选题'
@@ -73,6 +78,79 @@ const userAnswerText = computed(() => {
   const u = [...props.selected].sort().join('')
   return u || '（未选）'
 })
+
+// Build a quick-jump grid with memory tags
+// Sort mode: 'sequential' | 'recent' | 'wrong-only'
+const jumpSort = ref('sequential')
+const jumpQuery = ref('')
+
+const jumpList = computed(() => {
+  const list = props.activeQuestions.map((q, idx) => {
+    const id = q.id
+    return {
+      id, idx, q,
+      isCurrent: idx === props.index,
+      isWrong: props.wrongIndexes.includes(id),
+      isVisited: !!props.visitedAt[id],
+      visitedAt: props.visitedAt[id] || 0
+    }
+  })
+  let filtered = list
+  if (jumpQuery.value) {
+    const q = jumpQuery.value.trim()
+    if (/^\d+$/.test(q)) {
+      // Numeric: jump directly to that question number (1-based)
+      const n = parseInt(q, 10)
+      filtered = list.filter(it => it.id + 1 === n)
+    } else {
+      filtered = list.filter(it => it.q.question.includes(q))
+    }
+  }
+  if (jumpSort.value === 'recent') {
+    filtered = [...filtered].sort((a, b) => b.visitedAt - a.visitedAt)
+  } else if (jumpSort.value === 'wrong-only') {
+    filtered = filtered.filter(it => it.isWrong)
+  } else if (jumpSort.value === 'visited-only') {
+    filtered = filtered.filter(it => it.isVisited)
+  }
+  return filtered.slice(0, 200) // cap for performance
+})
+
+const totalLabels = computed(() => ({
+  total: props.activeQuestions.length,
+  visited: Object.keys(props.visitedAt).filter(id => {
+    return props.activeQuestions.some(q => String(q.id) === id)
+  }).length,
+  wrong: props.wrongIndexes.filter(id => props.activeQuestions.some(q => q.id === id)).length
+}))
+
+function doJump(targetId) {
+  emit('jump', targetId)
+  showPanel.value = false
+  jumpQuery.value = ''
+}
+
+// Mark visited on mount and when question changes
+function recordVisit() {
+  emit('visited')
+}
+
+onMounted(() => {
+  recordVisit()
+  document.addEventListener('click', onDocClick)
+})
+onUnmounted(() => {
+  document.removeEventListener('click', onDocClick)
+})
+function onDocClick(e) {
+  if (!showPanel.value) return
+  if (!e.target.closest('.q-toolbar')) {
+    showPanel.value = false
+  }
+}
+watch(() => props.question.id, () => {
+  recordVisit()
+})
 </script>
 
 <template>
@@ -84,6 +162,41 @@ const userAnswerText = computed(() => {
     </div>
     <div class="progress-bar">
       <div class="progress-fill" :style="{ width: progress + '%' }"></div>
+    </div>
+
+    <div class="q-toolbar">
+      <button class="tool-btn" @click="showPanel = !showPanel">
+        🔢 选题 <span class="hint">第 {{ index + 1 }} / {{ total }}</span>
+      </button>
+      <div v-if="showPanel" class="jump-panel" @click.stop>
+        <div class="jump-header">
+          <input
+            v-model="jumpQuery"
+            class="jump-input"
+            placeholder="输入题号或关键词搜索…"
+          />
+        </div>
+        <div class="jump-tabs">
+          <button :class="['tab', { active: jumpSort === 'sequential' }]" @click="jumpSort='sequential'">顺序</button>
+          <button :class="['tab', { active: jumpSort === 'recent' }]" @click="jumpSort='recent'">最近访问</button>
+          <button :class="['tab', { active: jumpSort === 'visited-only' }]" @click="jumpSort='visited-only'">已浏览</button>
+          <button :class="['tab', { active: jumpSort === 'wrong-only' }]" @click="jumpSort='wrong-only'">⚠️ 错题 ({{ totalLabels.wrong }})</button>
+        </div>
+        <div class="jump-grid">
+          <button
+            v-for="item in jumpList"
+            :key="item.idx"
+            :class="['jump-num', { current: item.isCurrent, wrong: item.isWrong, visited: item.isVisited }]"
+            @click="doJump(item.id)"
+            :title="`第 ${item.id + 1} 题`"
+          >
+            <span class="num-text">{{ item.id + 1 }}</span>
+            <span v-if="item.isWrong" class="badge wrong-badge">错</span>
+            <span v-else-if="item.isVisited" class="badge visited-badge">●</span>
+          </button>
+          <div v-if="jumpList.length === 0" class="empty">无匹配题目</div>
+        </div>
+      </div>
     </div>
 
     <div class="question-page" style="padding-top:16px;">
@@ -152,4 +265,109 @@ const userAnswerText = computed(() => {
 <style scoped>
 .correct-text { color: #4caf50; }
 .wrong-text { color: #f44336; }
+
+/* Jump-to-question toolbar */
+.q-toolbar {
+  position: relative;
+  padding: 8px 16px;
+  background: #fafafa;
+  border-bottom: 1px solid #ececec;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.tool-btn {
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  color: #424242;
+}
+.tool-btn .hint {
+  margin-left: 6px;
+  color: #757575;
+  font-size: 12px;
+}
+.jump-panel {
+  position: absolute;
+  top: 100%;
+  left: 16px;
+  right: 16px;
+  z-index: 100;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  max-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  margin-top: 4px;
+}
+.jump-header { padding: 8px; border-bottom: 1px solid #ececec; }
+.jump-input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+.jump-tabs {
+  display: flex;
+  border-bottom: 1px solid #ececec;
+  background: #fafafa;
+}
+.jump-tabs .tab {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 8px 4px;
+  font-size: 12px;
+  cursor: pointer;
+  color: #616161;
+  border-bottom: 2px solid transparent;
+}
+.jump-tabs .tab.active {
+  color: #1976d2;
+  border-bottom-color: #1976d2;
+  font-weight: 600;
+}
+.jump-grid {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+  gap: 6px;
+}
+.jump-num {
+  position: relative;
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 8px 4px;
+  font-size: 13px;
+  cursor: pointer;
+  min-height: 36px;
+  color: #424242;
+}
+.jump-num:hover { background: #e3f2fd; border-color: #1976d2; }
+.jump-num.visited { background: #fff8e1; border-color: #ffcc02; }
+.jump-num.wrong { background: #ffebee; border-color: #ef5350; color: #c62828; font-weight: 600; }
+.jump-num.current { background: #1976d2; color: #fff; border-color: #1976d2; box-shadow: 0 0 0 2px rgba(25,118,210,0.3); }
+.jump-num .badge {
+  position: absolute;
+  top: 1px;
+  right: 2px;
+  font-size: 9px;
+  line-height: 1;
+}
+.jump-num .visited-badge { color: #f57f17; }
+.jump-num.current .visited-badge { color: #fff; }
+.jump-num .wrong-badge { color: #d32f2f; font-weight: 700; }
+.jump-num.current .wrong-badge { color: #fff; }
+.jump-num .num-text { display: block; }
+.empty { grid-column: 1 / -1; text-align: center; padding: 24px; color: #9e9e9e; font-size: 13px; }
 </style>

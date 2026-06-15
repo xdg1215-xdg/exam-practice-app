@@ -12,6 +12,7 @@ const currentIndex = ref(0)
 const showAnswer = ref(false)
 const wrongIndexes = ref([])
 const finished = ref(false)
+const visitedAt = ref({}) // q.id -> timestamp ms (training memory)
 
 const currentQuestion = computed(() => {
   if (currentIndex.value >= activeQuestions.value.length) return null
@@ -35,6 +36,11 @@ onMounted(async () => {
       wrongIndexes.value = []
     }
   }
+  // Load visited training memory
+  const visitedSaved = localStorage.getItem('visitedAt')
+  if (visitedSaved) {
+    try { visitedAt.value = JSON.parse(visitedSaved) } catch (e) {}
+  }
 })
 
 function startPractice(selectedMode) {
@@ -56,6 +62,34 @@ function startPractice(selectedMode) {
   showAnswer.value = false
   finished.value = false
   view.value = 'practice'
+}
+
+function onJump(targetId) {
+  // targetId is the question.id in the original questions array
+  // Find its index within activeQuestions
+  const idx = originalIndexMap.value.indexOf(targetId)
+  if (idx < 0) {
+    // Not in current practice session — notify user
+    alert('该题不在当前练习范围内')
+    return
+  }
+  currentIndex.value = idx
+  showAnswer.value = !!userAnswers.value[idx]
+  // Record visit
+  visitedAt.value[targetId] = Date.now()
+  localStorage.setItem('visitedAt', JSON.stringify(visitedAt.value))
+}
+
+function markVisited() {
+  const q = currentQuestion.value
+  if (!q) return
+  const id = q.id
+  const now = Date.now()
+  // Only update if newer than existing
+  if (!visitedAt.value[id] || visitedAt.value[id] < now) {
+    visitedAt.value[id] = now
+    localStorage.setItem('visitedAt', JSON.stringify(visitedAt.value))
+  }
 }
 
 function goHome() {
@@ -151,12 +185,17 @@ const stats = computed(() => {
       :selected="userAnswers[currentIndex] || []"
       :showAnswer="showAnswer"
       :mode="mode"
+      :activeQuestions="activeQuestions"
+      :wrongIndexes="wrongIndexes"
+      :visitedAt="visitedAt"
       @select="onSelect"
       @submit="onSubmit"
       @next="onNext"
       @prev="onPrev"
       @show="onShowAnswer"
       @home="goHome"
+      @jump="onJump"
+      @visited="markVisited"
     />
     <ResultView
       v-else-if="view === 'result'"
