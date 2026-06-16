@@ -52,7 +52,12 @@ jobs:
       - name: Install Android SDK components
         if: success()
         run: |
-          yes | sdkmanager --licenses
+          set -e
+          export ANDROID_HOME=$HOME/android-sdk
+          export ANDROID_SDK_ROOT=$HOME/android-sdk
+          # 接受所有 license：每行一个 y + 换行，覆盖5份协议
+          (for i in 1 2 3 4 5; do echo y; done) | sdkmanager --licenses > /dev/null
+          sdkmanager --update
           sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
 
       - name: Add Capacitor Android
@@ -72,18 +77,16 @@ jobs:
           echo "sdk.dir=$HOME/android-sdk" > android/local.properties
           echo "flutter.sdk=/dev/null" >> android/local.properties || true
 
-      - name: Install launcher icon (multi-density)
+      - name: Generate launcher icons (all densities + adaptive)
         if: success()
         run: |
           set -e
-          RES=android/app/src/main/res
-          mkdir -p $RES/mipmap-mdpi $RES/mipmap-hdpi $RES/mipmap-xhdpi $RES/mipmap-xxhdpi $RES/mipmap-xxxhdpi
-          sips -z 48 48   src/assets/logo.png --out $RES/mipmap-mdpi/ic_launcher.png    > /dev/null
-          sips -z 72 72   src/assets/logo.png --out $RES/mipmap-hdpi/ic_launcher.png    > /dev/null
-          sips -z 96 96   src/assets/logo.png --out $RES/mipmap-xhdpi/ic_launcher.png   > /dev/null
-          sips -z 144 144 src/assets/logo.png --out $RES/mipmap-xxhdpi/ic_launcher.png  > /dev/null
-          sips -z 192 192 src/assets/logo.png --out $RES/mipmap-xxxhdpi/ic_launcher.png > /dev/null
-          echo "Launcher icons installed (48/72/96/144/192 px)"
+          # @capacitor/assets 会在 android/app/src/main/res/ 下生成 5 密度 × (png/webp) + adaptive
+          node node_modules/@capacitor/assets/bin/capacitor-assets generate \
+            --android \
+            --assetSources src/assets/logo.png \
+            --logoBackground "#b71c1c" \
+            --logoPadding 0.1
 
       - name: Build APK
         if: success()
