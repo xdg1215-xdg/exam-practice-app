@@ -72,6 +72,19 @@ jobs:
           echo "sdk.dir=$HOME/android-sdk" > android/local.properties
           echo "flutter.sdk=/dev/null" >> android/local.properties || true
 
+      - name: Install launcher icon (multi-density)
+        if: success()
+        run: |
+          set -e
+          RES=android/app/src/main/res
+          mkdir -p $RES/mipmap-mdpi $RES/mipmap-hdpi $RES/mipmap-xhdpi $RES/mipmap-xxhdpi $RES/mipmap-xxxhdpi
+          sips -z 48 48   src/assets/logo.png --out $RES/mipmap-mdpi/ic_launcher.png    > /dev/null
+          sips -z 72 72   src/assets/logo.png --out $RES/mipmap-hdpi/ic_launcher.png    > /dev/null
+          sips -z 96 96   src/assets/logo.png --out $RES/mipmap-xhdpi/ic_launcher.png   > /dev/null
+          sips -z 144 144 src/assets/logo.png --out $RES/mipmap-xxhdpi/ic_launcher.png  > /dev/null
+          sips -z 192 192 src/assets/logo.png --out $RES/mipmap-xxxhdpi/ic_launcher.png > /dev/null
+          echo "Launcher icons installed (48/72/96/144/192 px)"
+
       - name: Build APK
         if: success()
         run: |

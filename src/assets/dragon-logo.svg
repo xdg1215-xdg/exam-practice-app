@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="paper" cx="50%" cy="45%" r="55%">
+      <stop offset="0%" stop-color="#fffbf0"/>
+      <stop offset="70%" stop-color="#f5ead0"/>
+      <stop offset="100%" stop-color="#e8d8a8"/>
+    </radialGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f9e79f"/>
+      <stop offset="50%" stop-color="#d4a017"/>
+      <stop offset="100%" stop-color="#8b6914"/>
+    </linearGradient>
+    <linearGradient id="hornGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#8b6914"/>
+      <stop offset="50%" stop-color="#d4a017"/>
+      <stop offset="100%" stop-color="#8b6914"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- 圆形宣纸底 -->
+  <circle cx="256.0" cy="256.0" r="240" fill="url(#paper)"/>
+  <circle cx="256.0" cy="256.0" r="238" fill="none" stroke="#1a1a1a" stroke-width="2"/>
+  <circle cx="256.0" cy="256.0" r="225" fill="none" stroke="#b71c1c" stroke-width="1" stroke-opacity="0.4"/>
+  
+  <!-- 顶部双龙戏珠简笔（祥云纹） -->
+  <g fill="#b71c1c" opacity="0.85">
+    <path d="M 180 100 Q 200 85, 230 90 Q 245 95, 240 110 Q 220 115, 200 110 Q 185 108, 180 100 Z"/>
+    <path d="M 332 100 Q 312 85, 282 90 Q 267 95, 272 110 Q 292 115, 312 110 Q 327 108, 332 100 Z"/>
+  </g>
+  <circle cx="256" cy="100" r="8" fill="url(#goldGrad)"/>
+  
+  <!-- 龙首组 -->
+  <g transform="translate(256.0, 265)">
+    <!-- ===== 龙角（从头顶两侧向后扫出） ===== -->
+    <g fill="url(#hornGrad)" stroke="#1a1a1a" stroke-width="1.5">
+      <!-- 左角：根部在 (-30,-60)，向后外扫到 (-100,-30) -->
+      <path d="
+        M -28 -65
+        Q -50 -85, -75 -75
+        Q -95 -65, -105 -45
+        Q -100 -50, -90 -45
+        Q -80 -45, -70 -55
+        Q -55 -55, -45 -50
+        Q -30 -50, -22 -55
+        Z"/>
+      <!-- 右角 -->
+      <path d="
+        M 28 -65
+        Q 50 -85, 75 -75
+        Q 95 -65, 105 -45
+        Q 100 -50, 90 -45
+        Q 80 -45, 70 -55
+        Q 55 -55, 45 -50
+        Q 30 -50, 22 -55
+        Z"/>
+    </g>
+    <!-- 角纹节 -->
+    <g fill="none" stroke="#1a1a1a" stroke-width="0.8">
+      <path d="M -75 -78 Q -78 -72, -75 -65"/>
+      <path d="M -90 -68 Q -92 -62, -88 -55"/>
+      <path d="M 75 -78 Q 78 -72, 75 -65"/>
+      <path d="M 90 -68 Q 92 -62, 88 -55"/>
+    </g>
+    
+    <!-- ===== 龙头主轮廓（圆润正面，比v3稍宽） ===== -->
+    <path d="
+      M -75 -55
+      Q -85 -75, -70 -85
+      Q -50 -90, -25 -88
+      Q 0 -90, 25 -88
+      Q 50 -90, 70 -85
+      Q 85 -75, 75 -55
+      Q 88 -35, 82 0
+      Q 88 25, 72 45
+      Q 55 60, 32 65
+      L 22 75
+      Q 11 80, 0 80
+      Q -11 80, -22 75
+      L -32 65
+      Q -55 60, -72 45
+      Q -88 25, -82 0
+      Q -88 -35, -75 -55 Z" 
+      fill="url(#goldGrad)" stroke="#1a1a1a" stroke-width="2"/>
+    
+    <!-- 额头鳞纹（V 形，王字纹） -->
+    <g fill="none" stroke="#7f1010" stroke-width="1.5" stroke-linecap="round">
+      <path d="M 0 -75 L -10 -62"/>
+      <path d="M 0 -75 L 10 -62"/>
+      <path d="M -18 -65 L -28 -52"/>
+      <path d="M 18 -65 L 28 -52"/>
+      <!-- 王字简化纹 -->
+      <path d="M -12 -55 L 12 -55" stroke-width="2"/>
+    </g>
+    
+    <!-- 眉骨（粗壮上扬，末端分叉） -->
+    <g fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round">
+      <path d="M -60 -32 Q -45 -45, -25 -38 L -18 -45"/>
+      <path d="M 60 -32 Q 45 -45, 25 -38 L 18 -45"/>
+    </g>
+    
+    <!-- ===== 龙眼（大而圆，威严，红瞳） ===== -->
+    <ellipse cx="-32" cy="-10" rx="16" ry="14" fill="#fff" stroke="#1a1a1a" stroke-width="1.5"/>
+    <ellipse cx="32" cy="-10" rx="16" ry="14" fill="#fff" stroke="#1a1a1a" stroke-width="1.5"/>
+    <ellipse cx="-32" cy="-10" rx="12" ry="11" fill="#b71c1c"/>
+    <ellipse cx="32" cy="-10" rx="12" ry="11" fill="#b71c1c"/>
+    <ellipse cx="-32" cy="-10" rx="6" ry="9" fill="#1a1a1a"/>
+    <ellipse cx="32" cy="-10" rx="6" ry="9" fill="#1a1a1a"/>
+    <circle cx="-34" cy="-15" r="2.5" fill="#fff"/>
+    <circle cx="30" cy="-15" r="2.5" fill="#fff"/>
+    
+    <!-- 睫毛（向上挑） -->
+    <g fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round">
+      <path d="M -45 -22 L -48 -28"/>
+      <path d="M -38 -25 L -40 -32"/>
+      <path d="M 45 -22 L 48 -28"/>
+      <path d="M 38 -25 L 40 -32"/>
+    </g>
+    
+    <!-- ===== 鼻梁（窄长条，从眼间向下） ===== -->
+    <path d="
+      M -5 -5
+      L 5 -5
+      L 7 15
+      Q 4 22, 0 25
+      Q -4 22, -7 15
+      Z" fill="url(#goldGrad)" stroke="#1a1a1a" stroke-width="1.2"/>
+    <!-- 鼻尖小球 -->
+    <circle cx="0" cy="27" r="5" fill="#7f1010" stroke="#1a1a1a" stroke-width="1"/>
+    <!-- 鼻孔（鼻翼两侧） -->
+    <ellipse cx="-8" cy="22" rx="1.5" ry="2.5" fill="#1a1a1a" transform="rotate(-20 -8 22)"/>
+    <ellipse cx="8" cy="22" rx="1.5" ry="2.5" fill="#1a1a1a" transform="rotate(20 8 22)"/>
+    
+    <!-- ===== 龙须（飘逸向前） ===== -->
+    <g fill="none" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round">
+      <path d="M -8 32 Q -30 45, -45 65 Q -50 80, -42 90 Q -38 80, -32 70 Q -22 55, -10 45"/>
+      <path d="M 8 32 Q 30 45, 45 65 Q 50 80, 42 90 Q 38 80, 32 70 Q 22 55, 10 45"/>
+    </g>
+    
+    <!-- ===== 嘴部（张开露牙） ===== -->
+    <path d="
+      M -28 42
+      Q -20 50, 0 52
+      Q 20 50, 28 42
+      Q 28 50, 22 58
+      Q 12 64, 0 64
+      Q -12 64, -22 58
+      Q -28 50, -28 42 Z" 
+      fill="#7f1010" stroke="#1a1a1a" stroke-width="1.5"/>
+    
+    <!-- 牙齿（上4下4） -->
+    <g fill="#fff" stroke="#1a1a1a" stroke-width="0.5">
+      <path d="M -20 44 L -17 52 L -14 44 Z"/>
+      <path d="M -10 45 L -7 53 L -4 45 Z"/>
+      <path d="M 4 45 L 7 53 L 10 45 Z"/>
+      <path d="M 14 44 L 17 52 L 20 44 Z"/>
+      <!-- 下齿 -->
+      <path d="M -8 60 L -6 56 L -4 60 Z"/>
+      <path d="M 4 60 L 6 56 L 8 60 Z"/>
+    </g>
+    
+    <!-- 下颚鳞（点状） -->
+    <g fill="#7f1010">
+      <circle cx="-45" cy="38" r="1.8"/>
+      <circle cx="-38" cy="48" r="1.5"/>
+      <circle cx="38" cy="48" r="1.5"/>
+      <circle cx="45" cy="38" r="1.8"/>
+    </g>
+  </g>
+  
+  <!-- 底部"雲龍"二字（篆体风） -->
+  <text x="256.0" y="430" text-anchor="middle" fill="#1a1a1a" 
+        font-family="'STKaiti','KaiTi','楷体',serif" 
+        font-size="48" font-weight="bold" letter-spacing="14">雲龍</text>
+  
+  <!-- 底部副标题"定制" -->
+  <text x="256.0" y="465" text-anchor="middle" fill="#b71c1c" 
+        font-family="'STKaiti','KaiTi','楷体',serif" 
+        font-size="18" letter-spacing="6">· 定 制 ·</text>
+  
+  <!-- 角落印章"龍" -->
+  <g transform="translate(72, 72)">
+    <rect x="-16" y="-16" width="32" height="32" fill="#b71c1c" rx="2"/>
+    <text x="0" y="7" text-anchor="middle" fill="#fff" 
+          font-family="serif" font-size="24" font-weight="bold">龍</text>
+  </g>
+</svg>

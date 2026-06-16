@@ -1,4 +1,6 @@
 <script setup>
+import logoUrl from '../assets/logo.png'
+
 defineProps({
   total: { type: Number, default: 0 },
   wrongCount: { type: Number, default: 0 }
@@ -8,8 +10,9 @@ const emit = defineEmits(['start', 'clear'])
 
 <template>
   <div class="home">
-    <h1>📚 制造系统练习</h1>
-    <p class="subtitle">中盐常化 2026 年职能部室中层管理人员制度学习题库</p>
+    <img :src="logoUrl" alt="云龙定制" class="logo" />
+    <h1>🐉 云龙定制</h1>
+    <p class="subtitle">中盐常化 2026 年管理人员制度学习题库</p>
 
     <div class="mode-list">
       <button class="mode-btn" @click="emit('start', 'sequential')">
@@ -38,3 +41,13 @@ const emit = defineEmits(['start', 'clear'])
     </p>
   </div>
 </template>
+
+<style scoped>
+.logo {
+  width: 120px;
+  height: 120px;
+  display: block;
+  margin: 0 auto 12px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
+}
+</style>
