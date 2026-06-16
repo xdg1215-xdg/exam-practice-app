@@ -77,16 +77,14 @@ jobs:
           echo "sdk.dir=$HOME/android-sdk" > android/local.properties
           echo "flutter.sdk=/dev/null" >> android/local.properties || true
 
-      - name: Generate launcher icons (all densities + adaptive)
+      - name: Install launcher icons (pre-generated, 5 densities + adaptive)
         if: success()
         run: |
           set -e
-          # @capacitor/assets 会在 android/app/src/main/res/ 下生成 5 密度 × (png/webp) + adaptive
-          node node_modules/@capacitor/assets/bin/capacitor-assets generate \
-            --android \
-            --assetSources src/assets/logo.png \
-            --logoBackground "#b71c1c" \
-            --logoPadding 0.1
+          # 资源已经预生成好 + commit 到 launcher-resources/android-res/
+          # (避免在 CI 里依赖 sharp + @capacitor/assets 容易装不上)
+          cp -r launcher-resources/android-res/. android/app/src/main/res/
+          echo "Launcher icons installed from launcher-resources/"
 
       - name: Build APK
         if: success()
